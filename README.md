@@ -129,8 +129,6 @@ Slot 4:
    - Verify application running
    - Check network connection
 
-## 📞 Support
-For issues or queries, create an issue in the repository.
 
 
 
