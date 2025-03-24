@@ -60,7 +60,7 @@ A modern smart parking system that uses Raspberry Pi to detect parking spot avai
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/yourusername/smart-parking-system.git
+   git clone https://github.com/nirajumaretiya/smart-parking-system.git
    cd smart-parking-system
    ```
 
