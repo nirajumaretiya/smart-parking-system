@@ -47,12 +47,110 @@ A modern smart parking system that uses Raspberry Pi to detect parking spot avai
 - RPi.GPIO library
 - SQLite3 (built-in)
 
-## 🚀 Quick Start
-1. Set up Raspberry Pi with required OS
-2. Install necessary Python packages
-3. Connect hardware components
-4. Run the application
-5. Access web interface through browser
+## 📚 Documentation
+
+### 🚀 Getting Started
+
+#### Prerequisites
+1. Raspberry Pi 3B+ or 4 with Raspberry Pi OS installed
+2. Basic knowledge of Python and electronics
+3. Required hardware components (listed above)
+
+#### Installation Steps
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/yourusername/smart-parking-system.git
+   cd smart-parking-system
+   ```
+
+2. **Set Up Python Environment**
+   ```bash
+   # Create and activate virtual environment (recommended)
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+   # Install required packages
+   pip install -r requirements.txt
+   ```
+
+3. **Hardware Setup**
+   ```plaintext
+   Connect the components as follows:
+   
+   Ultrasonic Sensor (HC-SR04):
+   - VCC  → 5V (Pin 2)
+   - GND  → GND (Pin 6)
+   - TRIG → GPIO17 (Pin 11)
+   - ECHO → GPIO27 (Pin 13)
+
+   LEDs:
+   - Red LED:
+     * Anode → 220Ω Resistor → GPIO22 (Pin 15)
+     * Cathode → GND (Pin 6)
+   
+   - Green LED:
+     * Anode → 220Ω Resistor → GPIO23 (Pin 16)
+     * Cathode → GND (Pin 6)
+   ```
+
+4. **Enable GPIO**
+   ```bash
+   sudo raspi-config
+   # Navigate to Interface Options → GPIO → Enable
+   ```
+
+5. **Run the Application**
+   ```bash
+   # Start the application
+   python3 main.py
+   ```
+
+6. **Access the Web Interface**
+   ```bash
+   # Find your Raspberry Pi's IP address
+   hostname -I
+   
+   # Open in browser:
+   # http://<raspberry_pi_ip>:5000
+   ```
+
+### 🔧 Configuration
+
+The system can be configured by modifying the following files:
+- `config.py`: System settings and thresholds
+- `database.py`: Database configuration
+- `templates/index.html`: Web interface customization
+
+### 🧪 Testing
+
+1. **Hardware Testing**
+   ```bash
+   python3 tests/hardware_test.py
+   ```
+
+2. **Software Testing**
+   ```bash
+   python3 tests/software_test.py
+   ```
+
+### 🔍 Troubleshooting
+
+Common issues and solutions:
+1. **LEDs not working**
+   - Check connections
+   - Verify GPIO pins
+   - Test with multimeter
+
+2. **Sensor not detecting**
+   - Check power supply
+   - Verify connections
+   - Clean sensor surface
+
+3. **Web interface not accessible**
+   - Check IP address
+   - Verify application running
+   - Check network connection
 
 ## 💡 Benefits
 - ⏱️ Reduces time spent searching for parking
@@ -77,6 +175,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📞 Support
 For any issues or queries, please refer to the troubleshooting section in the documentation or create an issue in the repository.
+
 
 
 
