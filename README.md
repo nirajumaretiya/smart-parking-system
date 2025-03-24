@@ -78,6 +78,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📞 Support
 For any issues or queries, please refer to the troubleshooting section in the documentation or create an issue in the repository.
 
-## 📝 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 
