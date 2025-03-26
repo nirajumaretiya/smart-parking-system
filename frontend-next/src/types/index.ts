@@ -12,4 +12,23 @@ export interface ParkingStatus {
     occupancyRate: string;
   };
   systemStatus: string;
+}
+
+// Backend API response types
+export interface BackendSlot {
+  id: number;
+  occupied: boolean;
+}
+
+export interface BackendStatus {
+  slots: BackendSlot[];
+  timestamp: string;
+}
+
+export interface BackendStatistics {
+  total_slots: number;
+  occupied_slots: number;
+  available_slots: number;
+  occupancy_rate: number;
+  last_update: string;
 } 

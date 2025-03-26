@@ -21,8 +21,33 @@ export default function Home() {
   const fetchStatus = async () => {
     try {
       const response = await fetch('/api/status');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch status');
+      }
+      
       const data = await response.json();
-      setParkingStatus(data);
+      
+      // Transform backend data to match frontend structure
+      const transformedData = {
+        slots: data.slots.map((slot: any) => ({
+          occupied: slot.occupied,
+          timestamp: data.timestamp || null,
+          duration: null // Backend doesn't provide duration yet
+        })),
+        timestamp: data.timestamp || '-',
+        statistics: {
+          // Calculate available slots from the slots data
+          availableSlots: data.slots ? data.slots.filter((slot: any) => !slot.occupied).length : 0,
+          // Format occupancy rate
+          occupancyRate: data.slots ? 
+            `${Math.round((data.slots.filter((slot: any) => slot.occupied).length / data.slots.length) * 100)}%` : 
+            '0%'
+        },
+        systemStatus: 'Online'
+      };
+      
+      setParkingStatus(transformedData);
     } catch (error) {
       console.error('Error fetching status:', error);
       setParkingStatus(prev => ({
