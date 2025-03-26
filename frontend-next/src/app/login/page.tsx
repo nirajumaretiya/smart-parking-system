@@ -24,13 +24,15 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       });
 
+      const data = await response.json().catch(() => ({ message: 'Failed to parse server response' }));
+
       if (response.ok) {
         router.push('/');
       } else {
-        const data = await response.json();
         setError(data.message || 'Login failed. Please try again.');
       }
     } catch (error) {
+      console.error('Login error:', error);
       setError('Network error. Please try again later.');
     } finally {
       setIsLoading(false);

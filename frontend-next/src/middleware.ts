@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   // Skip middleware for API routes and login page
-  if (request.nextUrl.pathname.startsWith('/api') || request.nextUrl.pathname === '/login') {
+  if (request.nextUrl.pathname.startsWith('/api') || 
+      request.nextUrl.pathname === '/login' ||
+      request.nextUrl.pathname.includes('_next')) {
     return NextResponse.next();
   }
 
@@ -14,13 +16,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
+  // For custom session cookie, if it's authenticated, allow the request
+  if (sessionCookie.value === 'authenticated') {
+    return NextResponse.next();
+  }
+
   try {
-    // Verify the session with the backend
+    // Verify the Flask session with the backend
     const response = await fetch('http://localhost:5000/api/verify-session', {
       method: 'GET',
       headers: {
         Cookie: `session=${sessionCookie.value}`,
-      }
+      },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -37,5 +45,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|api).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }; 

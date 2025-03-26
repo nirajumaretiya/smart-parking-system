@@ -7,10 +7,6 @@ const nextConfig = {
         destination: 'http://localhost:5000/api/:path*',
       },
       {
-        source: '/login',
-        destination: 'http://localhost:5000/login',
-      },
-      {
         source: '/logout',
         destination: 'http://localhost:5000/logout',
       },

@@ -14,8 +14,17 @@ app = Flask(__name__,
     static_folder='../frontend/dist',  # Serve static files from frontend build
     static_url_path=''  # Serve at root URL
 )
-CORS(app)  # Enable CORS for all routes
-app.secret_key = os.urandom(24)
+# Enable CORS with credentials support
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}})
+
+# Use a consistent secret key for development
+app.secret_key = 'smart-parking-system-development-key'
+
+# Configure session to be more compatible with Next.js
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_PATH'] = '/'
 
 # Admin credentials (in a real application, these should be stored securely in a database)
 ADMIN_USERNAME = "admin"
@@ -144,6 +153,8 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'logged_in' not in session:
+            if request.path.startswith('/api/'):
+                return jsonify({'error': 'Unauthorized'}), 401
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -151,15 +162,34 @@ def login_required(f):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        # Check if the request is JSON
+        if request.is_json:
+            data = request.get_json()
+            username = data.get('username')
+            password = data.get('password')
+        else:
+            # Handle form data
+            username = request.form.get('username')
+            password = request.form.get('password')
         
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['logged_in'] = True
+            # If the request expects JSON, return JSON
+            if request.is_json or request.headers.get('Accept') == 'application/json':
+                return jsonify({'success': True}), 200
+            # Otherwise redirect (for form submissions)
             return redirect(url_for('index'))
         else:
+            # Return error as JSON if requested, otherwise render template
+            if request.is_json or request.headers.get('Accept') == 'application/json':
+                return jsonify({'error': 'Invalid username or password'}), 401
             return render_template('login.html', error='Invalid username or password')
     
+    # For GET requests, check if JSON is expected
+    if request.headers.get('Accept') == 'application/json':
+        return jsonify({'message': 'Please submit login credentials'}), 200
+    
+    # Otherwise render the login template
     return render_template('login.html')
 
 @app.route('/logout')
@@ -211,6 +241,13 @@ def export_data():
         as_attachment=True,
         download_name=f'parking_history_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
     )
+
+@app.route('/api/verify-session')
+def verify_session():
+    """Verify if the user is logged in and return appropriate JSON response"""
+    if 'logged_in' in session:
+        return jsonify({'valid': True}), 200
+    return jsonify({'valid': False}), 401
 
 if __name__ == '__main__':
     sensor_thread = threading.Thread(target=update_sensors, daemon=True)
