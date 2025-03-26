@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Smart Parking System</h1>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+    
+    <div class="parking-grid">
+        {% for i in range(4) %}
+        <div class="parking-slot" id="slot-{{ i+1 }}">
+            <h2>Slot {{ i+1 }}</h2>
+            <div class="status-indicator">
+                <div class="led red"></div>
+                <div class="led green"></div>
+            </div>
+            <div class="status-text">Checking...</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="last-update">
+        Last Updated: <span id="timestamp">-</span>
+    </div>
+</div>
+{% endblock %}
