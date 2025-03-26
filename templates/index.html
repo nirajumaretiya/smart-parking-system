@@ -1,27 +1,92 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="header">
-        <h1>Smart Parking System</h1>
-        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
-    </div>
-    
-    <div class="parking-grid">
-        {% for i in range(4) %}
-        <div class="parking-slot" id="slot-{{ i+1 }}">
-            <h2>Slot {{ i+1 }}</h2>
-            <div class="status-indicator">
-                <div class="led red"></div>
-                <div class="led green"></div>
+<div class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-primary-600">Smart Parking System</h1>
+                </div>
+                <div class="flex items-center">
+                    <a href="{{ url_for('logout') }}" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Logout
+                    </a>
+                </div>
             </div>
-            <div class="status-text">Checking...</div>
         </div>
-        {% endfor %}
-    </div>
-    
-    <div class="last-update">
-        Last Updated: <span id="timestamp">-</span>
-    </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Parking Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for i in range(4) %}
+            <div class="bg-white overflow-hidden shadow rounded-lg" id="slot-{{ i+1 }}">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-900">Slot {{ i+1 }}</h3>
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500 opacity-30" id="red-{{ i+1 }}"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500 opacity-30" id="green-{{ i+1 }}"></div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-sm font-medium text-gray-500" id="status-{{ i+1 }}">Checking...</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- System Status -->
+        <div class="mt-6 bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="text-center text-sm text-gray-500">
+                    Last Updated: <span id="timestamp" class="font-medium">-</span>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
-{% endblock %}
+
+<script>
+function updateStatus() {
+    fetch('/api/status')
+        .then(response => response.json())
+        .then(data => {
+            // Update timestamp
+            document.getElementById('timestamp').textContent = data.timestamp;
+            
+            // Update each slot
+            data.slots.forEach(slot => {
+                const slotId = slot.id;
+                const redLed = document.getElementById(`red-${slotId}`);
+                const greenLed = document.getElementById(`green-${slotId}`);
+                const statusText = document.getElementById(`status-${slotId}`);
+                
+                if (slot.occupied) {
+                    redLed.classList.remove('opacity-30');
+                    greenLed.classList.add('opacity-30');
+                    statusText.textContent = 'Occupied';
+                    statusText.classList.remove('text-green-600');
+                    statusText.classList.add('text-red-600');
+                } else {
+                    redLed.classList.add('opacity-30');
+                    greenLed.classList.remove('opacity-30');
+                    statusText.textContent = 'Available';
+                    statusText.classList.remove('text-red-600');
+                    statusText.classList.add('text-green-600');
+                }
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Update status every second
+setInterval(updateStatus, 1000);
+updateStatus(); // Initial update
+</script>
+{% endblock %} 
