@@ -112,6 +112,36 @@ async function updateStatus() {
     }
 }
 
+// Function to create parking slot elements
+function createParkingSlots() {
+    const parkingGrid = document.getElementById('parking-grid');
+    for (let i = 1; i <= 4; i++) {
+        const slotElement = document.createElement('div');
+        slotElement.className = 'glass-effect rounded-lg p-6 slot-card';
+        slotElement.id = `slot-${i}`;
+        slotElement.innerHTML = `
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <span class="status-indicator bg-gray-300" id="status-indicator-${i}"></span>
+                    <h3 class="text-lg font-medium text-gray-900">Slot ${i}</h3>
+                </div>
+                <div class="flex space-x-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500 opacity-30" id="red-${i}"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500 opacity-30" id="green-${i}"></div>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-sm font-medium text-gray-500" id="status-${i}">Checking...</p>
+                <div class="text-xs text-gray-400">
+                    <p>Last Updated: <span id="slot-timestamp-${i}">-</span></p>
+                    <p>Duration: <span id="slot-duration-${i}">-</span></p>
+                </div>
+            </div>
+        `;
+        parkingGrid.appendChild(slotElement);
+    }
+}
+
 // Initialize
 function init() {
     // Start periodic updates
@@ -138,6 +168,12 @@ function init() {
         });
     });
 }
+
+// Initialize parking slots when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    createParkingSlots();
+    // ... rest of your initialization code ...
+});
 
 // Start the application
 document.addEventListener('DOMContentLoaded', init); 
