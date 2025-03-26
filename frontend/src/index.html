@@ -1,7 +1,15 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="min-h-screen">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking System</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="min-h-screen">
     <!-- Navigation -->
     <nav class="glass-effect fixed w-full z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,8 +23,8 @@
                         <i class="fas fa-clock mr-1"></i>
                         <span id="current-time">Loading...</span>
                     </div>
-                    <a href="{{ url_for('logout') }}" 
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                    <a href="/logout" 
+                        class="btn btn-primary">
                         <i class="fas fa-sign-out-alt mr-2"></i>
                         Logout
                     </a>
@@ -108,11 +116,11 @@
                     <p class="text-sm text-gray-500">Real-time monitoring and status updates</p>
                 </div>
                 <div class="flex space-x-4">
-                    <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <button class="btn btn-secondary" data-action="refresh">
                         <i class="fas fa-sync-alt mr-2"></i>
                         Refresh
                     </button>
-                    <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <button class="btn btn-secondary" data-action="export">
                         <i class="fas fa-download mr-2"></i>
                         Export
                     </button>
@@ -120,90 +128,8 @@
             </div>
         </div>
     </main>
-</div>
 
-<script>
-// Update current time
-function updateCurrentTime() {
-    const now = new Date();
-    document.getElementById('current-time').textContent = now.toLocaleTimeString();
-}
-setInterval(updateCurrentTime, 1000);
-updateCurrentTime();
-
-// Slot timestamps and durations
-const slotTimestamps = {};
-const slotDurations = {};
-
-function updateStatus() {
-    fetch('/api/status')
-        .then(response => response.json())
-        .then(data => {
-            // Update timestamp
-            document.getElementById('timestamp').textContent = data.timestamp;
-            
-            // Calculate statistics
-            let availableSlots = 0;
-            let occupiedSlots = 0;
-            
-            // Update each slot
-            data.slots.forEach(slot => {
-                const slotId = slot.id;
-                const redLed = document.getElementById(`red-${slotId}`);
-                const greenLed = document.getElementById(`green-${slotId}`);
-                const statusText = document.getElementById(`status-${slotId}`);
-                const statusIndicator = document.getElementById(`status-indicator-${slotId}`);
-                
-                if (slot.occupied) {
-                    occupiedSlots++;
-                    redLed.classList.remove('opacity-30');
-                    greenLed.classList.add('opacity-30');
-                    statusText.textContent = 'Occupied';
-                    statusText.classList.remove('text-green-600');
-                    statusText.classList.add('text-red-600');
-                    statusIndicator.classList.remove('bg-gray-300');
-                    statusIndicator.classList.add('bg-red-500');
-                    
-                    // Update timestamp and duration
-                    if (!slotTimestamps[slotId]) {
-                        slotTimestamps[slotId] = new Date();
-                    }
-                    const duration = Math.floor((new Date() - slotTimestamps[slotId]) / 1000);
-                    document.getElementById(`slot-timestamp-${slotId}`).textContent = 
-                        slotTimestamps[slotId].toLocaleTimeString();
-                    document.getElementById(`slot-duration-${slotId}`).textContent = 
-                        `${Math.floor(duration / 60)}m ${duration % 60}s`;
-                } else {
-                    availableSlots++;
-                    redLed.classList.add('opacity-30');
-                    greenLed.classList.remove('opacity-30');
-                    statusText.textContent = 'Available';
-                    statusText.classList.remove('text-red-600');
-                    statusText.classList.add('text-green-600');
-                    statusIndicator.classList.remove('bg-red-500');
-                    statusIndicator.classList.add('bg-gray-300');
-                    
-                    // Reset timestamp and duration
-                    slotTimestamps[slotId] = null;
-                    document.getElementById(`slot-timestamp-${slotId}`).textContent = '-';
-                    document.getElementById(`slot-duration-${slotId}`).textContent = '-';
-                }
-            });
-            
-            // Update statistics
-            document.getElementById('available-slots').textContent = availableSlots;
-            const occupancyRate = ((occupiedSlots / 4) * 100).toFixed(1);
-            document.getElementById('occupancy-rate').textContent = `${occupancyRate}%`;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('system-status').textContent = 'Offline';
-            document.getElementById('system-status').classList.add('text-red-600');
-        });
-}
-
-// Update status every second
-setInterval(updateStatus, 1000);
-updateStatus(); // Initial update
-</script>
-{% endblock %} 
+    <!-- Custom JS -->
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html> 
