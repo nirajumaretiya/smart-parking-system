@@ -129,6 +129,110 @@ Slot 4:
    - Verify application running
    - Check network connection
 
+## Project Structure
+
+```
+smart-parking-system/
+├── backend/                # Flask backend
+│   ├── app.py              # Main Flask application
+│   ├── package.json        # Backend package info
+│   └── requirements.txt    # Python dependencies
+│
+└── frontend-next/          # Next.js frontend
+    ├── src/                # Source code
+    ├── public/             # Static files
+    ├── package.json        # Frontend dependencies
+    └── next.config.mjs     # Next.js configuration
+```
+
+## Prerequisites
+
+- Node.js (v16+)
+- Python 3.8+
+- Raspberry Pi (optional for hardware integration)
+
+## Getting Started
+
+### Backend Setup
+
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
+
+2. Create a virtual environment:
+   ```
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment:
+   - On Windows: `venv\Scripts\activate`
+   - On macOS/Linux: `source venv/bin/activate`
+
+4. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+5. Run the backend:
+   ```
+   python app.py
+   ```
+   The API will be available at http://localhost:5000
+
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```
+   cd frontend-next
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the development server:
+   ```
+   npm run dev
+   ```
+   The frontend will be available at http://localhost:3000
+
+## Features
+
+- Real-time parking slot monitoring
+- User authentication
+- Parking space occupancy tracking
+- History and statistics
+- Export data as CSV
+- Responsive design
+
+## Default Login
+
+- Username: admin
+- Password: admin123
+
+## Running in Production
+
+### Backend
+
+```
+cd backend
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
+
+### Frontend
+
+```
+cd frontend-next
+npm run build
+npm start
+```
+
+## License
+
+MIT
+
 
 
 

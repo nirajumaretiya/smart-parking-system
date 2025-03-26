@@ -1,0 +1,13 @@
+{
+  "name": "smart-parking-system-backend",
+  "version": "1.0.0",
+  "description": "Backend for Smart Parking System",
+  "main": "app.py",
+  "scripts": {
+    "start": "python app.py",
+    "dev": "python app.py",
+    "prod": "gunicorn -w 4 -b 0.0.0.0:5000 app:app"
+  },
+  "author": "",
+  "license": "MIT"
+} 
