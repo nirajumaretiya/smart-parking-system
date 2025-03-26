@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session, send_file
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, send_file, send_from_directory
 from flask_cors import CORS
 from functools import wraps
 import RPi.GPIO as GPIO
@@ -10,7 +10,10 @@ import json
 import csv
 from io import StringIO
 
-app = Flask(__name__)
+app = Flask(__name__, 
+    static_folder='../frontend/dist',  # Serve static files from frontend build
+    static_url_path=''  # Serve at root URL
+)
 CORS(app)  # Enable CORS for all routes
 app.secret_key = os.urandom(24)
 
@@ -167,7 +170,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/api/status')
 @login_required
