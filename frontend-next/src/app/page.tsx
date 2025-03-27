@@ -80,7 +80,7 @@ export default function Home() {
     <>
       <Navbar />
       
-      <main className="pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+      <main className="container mx-auto pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <StatsOverview 
           availableSlots={parkingStatus.statistics.availableSlots}
           occupancyRate={parkingStatus.statistics.occupancyRate}

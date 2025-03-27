@@ -15,7 +15,7 @@ export default function ParkingSlot({
 }: ParkingSlotProps) {
   return (
     <div className="glass-effect rounded-lg p-6 slot-card" id={`slot-${slotNumber}`}>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 border-b pb-3">
         <div className="flex items-center">
           <span 
             className={`status-indicator ${isOccupied ? 'bg-red-500' : 'bg-green-500'}`} 
@@ -34,16 +34,22 @@ export default function ParkingSlot({
           ></div>
         </div>
       </div>
-      <div className="space-y-2">
+      <div className="flex-grow">
         <p 
-          className={`text-sm font-medium ${isOccupied ? 'text-red-600' : 'text-green-600'}`} 
+          className={isOccupied ? 'status-occupied' : 'status-available'} 
           id={`status-${slotNumber}`}
         >
           {isOccupied ? 'Occupied' : 'Available'}
         </p>
-        <div className="text-xs text-gray-400">
-          <p>Last Updated: <span id={`slot-timestamp-${slotNumber}`}>{lastUpdated}</span></p>
-          <p>Duration: <span id={`slot-duration-${slotNumber}`}>{duration}</span></p>
+        <div className="mt-3 text-xs text-gray-500 space-y-1">
+          <div className="flex justify-between">
+            <span className="font-medium">Last Updated:</span>
+            <span id={`slot-timestamp-${slotNumber}`} className="text-right">{lastUpdated}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium">Duration:</span>
+            <span id={`slot-duration-${slotNumber}`} className="text-right">{duration}</span>
+          </div>
         </div>
       </div>
     </div>
