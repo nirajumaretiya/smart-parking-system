@@ -32,12 +32,16 @@
         </div>
     </div>
 
-    <div class="charts-row">
+    <div class="charts-row pie-chart-row">
         <!-- Sensor Usage Pie Chart -->
         <div class="chart-container pie-chart-container">
-            <h2>Sensor Usage Statistics</h2>
-            <p class="chart-description">Total usage count per parking slot</p>
-            <canvas id="usageChart"></canvas>
+            <div class="chart-header">
+                <h2>Sensor Usage Statistics</h2>
+                <p class="chart-description">Total usage count per parking slot</p>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="usageChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -204,12 +208,17 @@ function initCharts() {
                     'rgba(139, 92, 246, 1)',
                     'rgba(245, 158, 11, 1)'
                 ],
-                borderWidth: 1
+                borderWidth: 1,
+                hoverOffset: 10
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '10%',  // Creates slight donut effect for better percentage visibility
+            layout: {
+                padding: 20
+            },
             plugins: {
                 datalabels: {
                     color: '#fff',
@@ -232,7 +241,8 @@ function initCharts() {
                     textStrokeColor: 'rgba(0, 0, 0, 0.8)',
                     textStrokeWidth: 2,
                     align: 'center',
-                    anchor: 'center'
+                    anchor: 'center',
+                    offset: 0
                 },
                 legend: {
                     position: 'right',
