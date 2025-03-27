@@ -6,15 +6,7 @@ const inter = Inter({ subsets: ["latin"], weight: ['300', '400', '500', '600', '
 
 export const metadata: Metadata = {
   title: "Smart Parking System",
-  description: "Real-time monitoring and status updates for parking spaces",
-  manifest: "/manifest.json",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
-      { url: "/favicon.svg", type: "image/svg+xml" }
-    ]
-  },
-  themeColor: "#3B82F6"
+  description: "Real-time monitoring and status updates for parking spaces"
 };
 
 export default function RootLayout({
