@@ -32,16 +32,12 @@
         </div>
     </div>
 
-    <div class="charts-row pie-chart-row">
+    <div class="charts-row">
         <!-- Sensor Usage Pie Chart -->
         <div class="chart-container pie-chart-container">
-            <div class="chart-header">
-                <h2>Sensor Usage Statistics</h2>
-                <p class="chart-description">Total usage count per parking slot</p>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="usageChart"></canvas>
-            </div>
+            <h2>Sensor Usage Statistics</h2>
+            <p class="chart-description">Total usage count per parking slot</p>
+            <canvas id="usageChart"></canvas>
         </div>
     </div>
 
@@ -208,23 +204,18 @@ function initCharts() {
                     'rgba(139, 92, 246, 1)',
                     'rgba(245, 158, 11, 1)'
                 ],
-                borderWidth: 1,
-                hoverOffset: 10
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '10%',  // Creates slight donut effect for better percentage visibility
-            layout: {
-                padding: 20
-            },
             plugins: {
                 datalabels: {
                     color: '#fff',
                     font: {
                         weight: 'bold',
-                        size: 18
+                        size: 16
                     },
                     formatter: (value, ctx) => {
                         const datapoints = ctx.chart.data.datasets[0].data;
@@ -236,38 +227,13 @@ function initCharts() {
                     display: function(context) {
                         const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                         return total > 0 && context.raw > 0;
-                    },
-                    textAlign: 'center',
-                    textStrokeColor: 'rgba(0, 0, 0, 0.8)',
-                    textStrokeWidth: 2,
-                    align: 'center',
-                    anchor: 'center',
-                    offset: 0
+                    }
                 },
                 legend: {
                     position: 'right',
                     labels: {
                         font: {
                             size: 14
-                        },
-                        generateLabels: function(chart) {
-                            const datasets = chart.data.datasets;
-                            const labels = chart.data.labels;
-                            const data = datasets[0].data;
-                            const total = data.reduce((a, b) => a + b, 0);
-                            
-                            return labels.map((label, i) => {
-                                const value = data[i];
-                                const percentage = total > 0 ? (value / total * 100).toFixed(1) + '%' : '0.0%';
-                                return {
-                                    text: `${label} (${value} uses, ${percentage})`,
-                                    fillStyle: datasets[0].backgroundColor[i],
-                                    strokeStyle: datasets[0].borderColor[i],
-                                    lineWidth: 1,
-                                    hidden: false,
-                                    index: i
-                                };
-                            });
                         }
                     }
                 },
@@ -279,9 +245,6 @@ function initCharts() {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = total > 0 ? (value / total * 100).toFixed(1) : '0.0';
                             return `${label}: ${value} uses (${percentage}%)`;
-                        },
-                        title: function(context) {
-                            return 'Parking Slot Usage';
                         }
                     }
                 }
