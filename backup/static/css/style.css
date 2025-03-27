@@ -428,7 +428,7 @@ body {
 
 /* Pie Chart specific styling */
 .pie-chart-container {
-  height: 400px;
+  height: 450px;
   flex: 1;
   min-width: 300px;
   display: flex;
