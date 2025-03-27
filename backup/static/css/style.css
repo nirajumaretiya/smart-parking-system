@@ -416,11 +416,18 @@ body {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.chart-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
   margin-bottom: 1rem;
+  font-style: italic;
 }
 
 .pie-chart-container {
-  height: 350px;
+  height: 400px;
   flex: 1;
   min-width: 300px;
 }

@@ -33,15 +33,10 @@
     </div>
 
     <div class="charts-row">
-        <!-- Parking Distribution Pie Chart -->
-        <div class="chart-container pie-chart-container">
-            <h2>Parking Distribution</h2>
-            <canvas id="distributionChart"></canvas>
-        </div>
-
         <!-- Sensor Usage Pie Chart -->
         <div class="chart-container pie-chart-container">
             <h2>Sensor Usage Statistics</h2>
+            <p class="chart-description">Total usage count per parking slot</p>
             <canvas id="usageChart"></canvas>
         </div>
     </div>
@@ -94,7 +89,6 @@
 <script>
 // Initialize Charts
 let occupancyChart;
-let distributionChart;
 let usageChart;
 let chartLabels = [];
 let chartData = [];
@@ -192,68 +186,6 @@ function initCharts() {
         }
     });
     
-    // Pie chart initialization for current distribution
-    const pieCtx = document.getElementById('distributionChart').getContext('2d');
-    distributionChart = new Chart(pieCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Occupied', 'Available'],
-            datasets: [{
-                data: [0, 3], // Default to all slots available
-                backgroundColor: [
-                    'rgba(239, 68, 68, 0.7)', // Red for occupied
-                    'rgba(16, 185, 129, 0.7)'  // Green for available
-                ],
-                borderColor: [
-                    'rgba(239, 68, 68, 1)',
-                    'rgba(16, 185, 129, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                datalabels: {
-                    color: '#fff',
-                    font: {
-                        weight: 'bold',
-                        size: 14
-                    },
-                    formatter: (value, ctx) => {
-                        const datapoints = ctx.chart.data.datasets[0].data;
-                        const total = datapoints.reduce((total, datapoint) => total + datapoint, 0);
-                        const percentage = (value / total * 100).toFixed(1) + '%';
-                        return percentage;
-                    }
-                },
-                legend: {
-                    position: 'right',
-                    labels: {
-                        font: {
-                            size: 14
-                        }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.raw || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = (value / total * 100).toFixed(1);
-                            return `${label}: ${value} (${percentage}%)`;
-                        }
-                    }
-                }
-            },
-            animation: {
-                duration: 500
-            }
-        }
-    });
-    
     // Pie chart initialization for sensor usage
     const usageCtx = document.getElementById('usageChart').getContext('2d');
     usageChart = new Chart(usageCtx, {
@@ -283,7 +215,7 @@ function initCharts() {
                     color: '#fff',
                     font: {
                         weight: 'bold',
-                        size: 14
+                        size: 16
                     },
                     formatter: (value, ctx) => {
                         const datapoints = ctx.chart.data.datasets[0].data;
@@ -295,13 +227,35 @@ function initCharts() {
                     display: function(context) {
                         const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                         return total > 0 && context.raw > 0;
-                    }
+                    },
+                    textAlign: 'center',
+                    textStrokeColor: 'rgba(0, 0, 0, 0.5)',
+                    textStrokeWidth: 1
                 },
                 legend: {
                     position: 'right',
                     labels: {
                         font: {
                             size: 14
+                        },
+                        generateLabels: function(chart) {
+                            const datasets = chart.data.datasets;
+                            const labels = chart.data.labels;
+                            const data = datasets[0].data;
+                            const total = data.reduce((a, b) => a + b, 0);
+                            
+                            return labels.map((label, i) => {
+                                const value = data[i];
+                                const percentage = total > 0 ? (value / total * 100).toFixed(1) + '%' : '0.0%';
+                                return {
+                                    text: `${label} (${value} uses, ${percentage})`,
+                                    fillStyle: datasets[0].backgroundColor[i],
+                                    strokeStyle: datasets[0].borderColor[i],
+                                    lineWidth: 1,
+                                    hidden: false,
+                                    index: i
+                                };
+                            });
                         }
                     }
                 },
@@ -313,6 +267,9 @@ function initCharts() {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = total > 0 ? (value / total * 100).toFixed(1) : '0.0';
                             return `${label}: ${value} uses (${percentage}%)`;
+                        },
+                        title: function(context) {
+                            return 'Parking Slot Usage';
                         }
                     }
                 }
@@ -347,16 +304,11 @@ function updateParkingStatus() {
         .then(data => {
             const slots = data.slots;
             let availableCount = data.available_spots;
-            let occupiedCount = data.total_spots - availableCount;
             
             // Update occupancy rate directly from API
             const occupancyRate = data.occupancy_rate.toFixed(1);
             document.getElementById('occupancy-rate').textContent = `${occupancyRate}%`;
             document.getElementById('available-spots').textContent = availableCount;
-            
-            // Update the pie chart with new data
-            distributionChart.data.datasets[0].data = [occupiedCount, availableCount];
-            distributionChart.update();
             
             // Update slot visualizations
             slots.forEach(slot => {
