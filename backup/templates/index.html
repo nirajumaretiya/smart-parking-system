@@ -23,16 +23,27 @@
         </div>
     </div>
 
-    <!-- Occupancy Chart Section -->
-    <div class="chart-container">
-        <h2>Occupancy Rate Over Time</h2>
-        <canvas id="occupancyChart"></canvas>
+    <!-- Charts Section -->
+    <div class="charts-row">
+        <!-- Occupancy Chart Section -->
+        <div class="chart-container">
+            <h2>Occupancy Rate Over Time</h2>
+            <canvas id="occupancyChart"></canvas>
+        </div>
     </div>
 
-    <!-- Parking Distribution Pie Chart -->
-    <div class="chart-container pie-chart-container">
-        <h2>Parking Distribution</h2>
-        <canvas id="distributionChart"></canvas>
+    <div class="charts-row">
+        <!-- Parking Distribution Pie Chart -->
+        <div class="chart-container pie-chart-container">
+            <h2>Parking Distribution</h2>
+            <canvas id="distributionChart"></canvas>
+        </div>
+
+        <!-- Sensor Usage Pie Chart -->
+        <div class="chart-container pie-chart-container">
+            <h2>Sensor Usage Statistics</h2>
+            <canvas id="usageChart"></canvas>
+        </div>
     </div>
 
     <div class="parking-grid">
@@ -82,6 +93,7 @@
 // Initialize Charts
 let occupancyChart;
 let distributionChart;
+let usageChart;
 let chartLabels = [];
 let chartData = [];
 
@@ -172,7 +184,7 @@ function initCharts() {
         }
     });
     
-    // Pie chart initialization
+    // Pie chart initialization for current distribution
     const pieCtx = document.getElementById('distributionChart').getContext('2d');
     distributionChart = new Chart(pieCtx, {
         type: 'pie',
@@ -211,6 +223,57 @@ function initCharts() {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = Math.round((value / total) * 100);
                             return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 500
+            }
+        }
+    });
+    
+    // Pie chart initialization for sensor usage
+    const usageCtx = document.getElementById('usageChart').getContext('2d');
+    usageChart = new Chart(usageCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Slot 1', 'Slot 2', 'Slot 3'],
+            datasets: [{
+                data: [0, 0, 0], // Default to no usage
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.7)',  // Blue for Slot 1
+                    'rgba(139, 92, 246, 0.7)',  // Purple for Slot 2
+                    'rgba(245, 158, 11, 0.7)'   // Orange for Slot 3
+                ],
+                borderColor: [
+                    'rgba(59, 130, 246, 1)',
+                    'rgba(139, 92, 246, 1)',
+                    'rgba(245, 158, 11, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} uses (${percentage}%)`;
                         }
                     }
                 }
@@ -294,6 +357,24 @@ function updateParkingStatus() {
         .catch(error => console.error('Error:', error));
 }
 
+// Fetch and update sensor usage data
+function updateUsageData() {
+    fetch('/api/usage')
+        .then(response => response.json())
+        .then(usageData => {
+            // Extract usage counts
+            const usageCounts = usageData.slot_usage.map(slot => slot.usage_count);
+            
+            // Update usage chart
+            usageChart.data.datasets[0].data = usageCounts;
+            usageChart.update();
+            
+            // Log usage data to console for debugging
+            console.log('Sensor Usage Data:', usageData);
+        })
+        .catch(error => console.error('Error fetching usage data:', error));
+}
+
 // Initialize everything when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize charts
@@ -302,10 +383,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update status immediately
     updateParkingStatus();
     updateChartData();
+    updateUsageData();
     
     // Set up regular updates
     setInterval(updateParkingStatus, 1000);
     setInterval(updateChartData, 5000); // Update chart every 5 seconds for real-time display
+    setInterval(updateUsageData, 5000); // Update usage data every 5 seconds
 });
 </script>
 {% endblock %} 

@@ -43,9 +43,13 @@ class ParkingSystem:
         self.last_history_update = datetime.now()
         self.history_interval = 5 # Update history every 5 seconds for more real-time display
         
+        # Sensor usage tracking - how many times each slot has been occupied
+        self.sensor_usage = [0] * len(self.sensors)  # Usage count for each sensor
+        self.previous_status = [False] * len(self.sensors)  # Previous status to detect changes
+        
         self._setup_pins()
-        self.status = [False] * 3  # False = empty, True = occupied
-        self.last_valid_distance = [0] * 3  # Store last valid distance for each sensor
+        self.status = [False] * len(self.sensors)  # False = empty, True = occupied
+        self.last_valid_distance = [0] * len(self.sensors)  # Store last valid distance for each sensor
     
     def _setup_pins(self):
         try:
@@ -105,7 +109,13 @@ class ParkingSystem:
                 if distance is not None:
                     self.last_valid_distance[i] = distance
                     is_occupied = distance < self.OCCUPANCY_THRESHOLD
+                    
+                    # Track usage when status changes from unoccupied to occupied
+                    if is_occupied and not self.previous_status[i]:
+                        self.sensor_usage[i] += 1
+                    
                     self.status[i] = is_occupied
+                    self.previous_status[i] = is_occupied
                     
                     # Comment out LED updates since LEDs are not connected
                     # GPIO.output(self.leds[i]['red'], is_occupied)
@@ -113,7 +123,13 @@ class ParkingSystem:
                 else:
                     # If reading failed, use last valid distance
                     is_occupied = self.last_valid_distance[i] < self.OCCUPANCY_THRESHOLD
+                    
+                    # Track usage when status changes from unoccupied to occupied
+                    if is_occupied and not self.previous_status[i]:
+                        self.sensor_usage[i] += 1
+                    
                     self.status[i] = is_occupied
+                    self.previous_status[i] = is_occupied
                     
                     # Comment out LED updates since LEDs are not connected
                     # GPIO.output(self.leds[i]['red'], is_occupied)
@@ -132,7 +148,7 @@ class ParkingSystem:
             occupancy_rate = (occupied_count / total_slots) * 100
             
             self.occupancy_history.append({
-                'timestamp': now.strftime('%H:%M'),
+                'timestamp': now.strftime('%H:%M:%S'),
                 'occupancy_rate': occupancy_rate
             })
             
@@ -160,6 +176,24 @@ class ParkingSystem:
     
     def get_occupancy_history(self):
         return list(self.occupancy_history)
+    
+    def get_sensor_usage(self):
+        total_usage = sum(self.sensor_usage)
+        
+        usage_data = [
+            {
+                'slot_id': i+1,
+                'usage_count': count,
+                'percentage': (count / total_usage * 100) if total_usage > 0 else 0
+            }
+            for i, count in enumerate(self.sensor_usage)
+        ]
+        
+        return {
+            'total_usage': total_usage,
+            'slot_usage': usage_data,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
     
     def cleanup(self):
         try:
@@ -220,6 +254,11 @@ def get_status():
 @login_required
 def get_history():
     return jsonify(parking_system.get_occupancy_history())
+
+@app.route('/api/usage')
+@login_required
+def get_usage():
+    return jsonify(parking_system.get_sensor_usage())
 
 if __name__ == '__main__':
     sensor_thread = threading.Thread(target=update_sensors, daemon=True)

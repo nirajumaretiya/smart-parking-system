@@ -392,6 +392,14 @@ body {
   color: var(--success);
 }
 
+/* Charts Section */
+.charts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
 /* Chart Containers */
 .chart-container {
   background: white;
@@ -400,6 +408,8 @@ body {
   margin-bottom: 2rem;
   box-shadow: var(--shadow);
   height: 300px;
+  flex: 1;
+  min-width: 300px;
 }
 
 .chart-container h2 {
@@ -409,18 +419,16 @@ body {
   margin-bottom: 1rem;
 }
 
+.pie-chart-container {
+  height: 350px;
+  flex: 1;
+  min-width: 300px;
+}
+
 /* Charts Layout */
 @media (min-width: 1024px) {
   .stats-container {
     grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .chart-container {
-    width: 100%;
-  }
-  
-  .pie-chart-container {
-    height: 350px;
   }
 }
 
@@ -464,6 +472,7 @@ body {
 
   .chart-container {
     height: 250px;
+    flex-basis: 100%;
   }
   
   .pie-chart-container {
