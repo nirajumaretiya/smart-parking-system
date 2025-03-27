@@ -203,16 +203,17 @@ function initCharts() {
             datasets: [{
                 data: [0, 0, 0], // Default to no usage
                 backgroundColor: [
-                    'rgba(59, 130, 246, 0.7)',  // Blue for Slot 1
-                    'rgba(139, 92, 246, 0.7)',  // Purple for Slot 2
-                    'rgba(245, 158, 11, 0.7)'   // Orange for Slot 3
+                    'rgba(59, 130, 246, 0.8)',  // Blue for Slot 1, more opaque
+                    'rgba(139, 92, 246, 0.8)',  // Purple for Slot 2, more opaque
+                    'rgba(245, 158, 11, 0.8)'   // Orange for Slot 3, more opaque
                 ],
                 borderColor: [
                     'rgba(59, 130, 246, 1)',
                     'rgba(139, 92, 246, 1)',
                     'rgba(245, 158, 11, 1)'
                 ],
-                borderWidth: 1
+                borderWidth: 2,
+                hoverOffset: 15 // More separation on hover
             }]
         },
         options: {
@@ -231,7 +232,7 @@ function initCharts() {
                     color: '#fff',
                     font: {
                         weight: 'bold',
-                        size: 16
+                        size: 20
                     },
                     formatter: (value, ctx) => {
                         const datapoints = ctx.chart.data.datasets[0].data;
@@ -243,7 +244,17 @@ function initCharts() {
                     display: function(context) {
                         const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                         return total > 0 && context.raw > 0;
-                    }
+                    },
+                    textShadow: {
+                        x: 2,
+                        y: 2,
+                        blur: 5,
+                        color: 'rgba(0, 0, 0, 0.5)'
+                    },
+                    borderWidth: 2,
+                    borderColor: 'white',
+                    borderRadius: 4,
+                    padding: 6
                 },
                 legend: {
                     position: 'right',
