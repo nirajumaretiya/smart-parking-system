@@ -39,9 +39,9 @@ class ParkingSystem:
         self.TIMEOUT = 0.1  # Timeout for sensor reading in seconds
         
         # Occupancy history data - track the last 60 readings with more frequent updates
-        self.occupancy_history = deque(maxlen=20)
+        self.occupancy_history = deque(maxlen=60)
         self.last_history_update = datetime.now()
-        self.history_interval = 2 # Update history every 5 seconds for more real-time display
+        self.history_interval = 5 # Update history every 5 seconds for more real-time display
         
         self._setup_pins()
         self.status = [False] * 3  # False = empty, True = occupied
