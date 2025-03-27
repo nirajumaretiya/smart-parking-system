@@ -428,9 +428,19 @@ body {
 
 /* Pie Chart specific styling */
 .pie-chart-container {
-  height: 350px;
+  height: 400px;
   flex: 1;
   min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pie-chart-container canvas {
+  flex: 1;
+  max-height: 320px;
+  width: 100% !important;
+  height: auto !important;
 }
 
 /* Charts Layout */
