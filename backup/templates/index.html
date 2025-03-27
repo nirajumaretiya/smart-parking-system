@@ -87,13 +87,43 @@ function initChart() {
             datasets: [{
                 label: 'Occupancy Rate (%)',
                 data: chartData,
-                backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                borderColor: 'rgba(59, 130, 246, 1)',
+                backgroundColor: function(context) {
+                    const index = context.dataIndex;
+                    const value = context.dataset.data[index];
+                    if (value >= 80) {
+                        return 'rgba(239, 68, 68, 0.2)'; // Red for high occupancy
+                    } else if (value >= 50) {
+                        return 'rgba(245, 158, 11, 0.2)'; // Orange for moderate
+                    } else {
+                        return 'rgba(16, 185, 129, 0.2)'; // Green for low
+                    }
+                },
+                borderColor: function(context) {
+                    const index = context.dataIndex;
+                    const value = context.dataset.data[index];
+                    if (value >= 80) {
+                        return 'rgba(239, 68, 68, 1)'; // Red for high occupancy
+                    } else if (value >= 50) {
+                        return 'rgba(245, 158, 11, 1)'; // Orange for moderate
+                    } else {
+                        return 'rgba(16, 185, 129, 1)'; // Green for low
+                    }
+                },
                 borderWidth: 2,
                 tension: 0.3,
                 fill: true,
-                pointRadius: 3,
-                pointBackgroundColor: 'rgba(59, 130, 246, 1)'
+                pointRadius: 4,
+                pointBackgroundColor: function(context) {
+                    const index = context.dataIndex;
+                    const value = context.dataset.data[index];
+                    if (value >= 80) {
+                        return 'rgba(239, 68, 68, 1)'; // Red for high occupancy
+                    } else if (value >= 50) {
+                        return 'rgba(245, 158, 11, 1)'; // Orange for moderate
+                    } else {
+                        return 'rgba(16, 185, 129, 1)'; // Green for low
+                    }
+                }
             }]
         },
         options: {
@@ -122,10 +152,14 @@ function initChart() {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return context.parsed.y.toFixed(1) + '%';
+                            const value = context.parsed.y.toFixed(1);
+                            return `Occupancy: ${value}%`;
                         }
                     }
                 }
+            },
+            animation: {
+                duration: 500 // Faster animations for real-time updates
             }
         }
     });
@@ -208,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up regular updates
     setInterval(updateParkingStatus, 1000);
-    setInterval(updateChartData, 60000); // Update chart every minute
+    setInterval(updateChartData, 5000); // Update chart every 5 seconds for real-time display
 });
 </script>
 {% endblock %} 
