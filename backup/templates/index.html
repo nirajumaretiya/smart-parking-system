@@ -29,6 +29,12 @@
         <canvas id="occupancyChart"></canvas>
     </div>
 
+    <!-- Parking Distribution Pie Chart -->
+    <div class="chart-container pie-chart-container">
+        <h2>Parking Distribution</h2>
+        <canvas id="distributionChart"></canvas>
+    </div>
+
     <div class="parking-grid">
         <div class="parking-slot" data-slot="1">
             <div class="slot-header">
@@ -73,14 +79,16 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-// Initialize Chart
+// Initialize Charts
 let occupancyChart;
+let distributionChart;
 let chartLabels = [];
 let chartData = [];
 
-function initChart() {
-    const ctx = document.getElementById('occupancyChart').getContext('2d');
-    occupancyChart = new Chart(ctx, {
+function initCharts() {
+    // Line chart initialization
+    const lineCtx = document.getElementById('occupancyChart').getContext('2d');
+    occupancyChart = new Chart(lineCtx, {
         type: 'line',
         data: {
             labels: chartLabels,
@@ -163,6 +171,55 @@ function initChart() {
             }
         }
     });
+    
+    // Pie chart initialization
+    const pieCtx = document.getElementById('distributionChart').getContext('2d');
+    distributionChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Occupied', 'Available'],
+            datasets: [{
+                data: [0, 3], // Default to all slots available
+                backgroundColor: [
+                    'rgba(239, 68, 68, 0.7)', // Red for occupied
+                    'rgba(16, 185, 129, 0.7)'  // Green for available
+                ],
+                borderColor: [
+                    'rgba(239, 68, 68, 1)',
+                    'rgba(16, 185, 129, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 500
+            }
+        }
+    });
 }
 
 // Fetch and update chart data
@@ -188,12 +245,18 @@ function updateParkingStatus() {
         .then(data => {
             const slots = data.slots;
             let availableCount = data.available_spots;
+            let occupiedCount = data.total_spots - availableCount;
             
             // Update occupancy rate directly from API
             const occupancyRate = data.occupancy_rate.toFixed(1);
             document.getElementById('occupancy-rate').textContent = `${occupancyRate}%`;
             document.getElementById('available-spots').textContent = availableCount;
             
+            // Update the pie chart with new data
+            distributionChart.data.datasets[0].data = [occupiedCount, availableCount];
+            distributionChart.update();
+            
+            // Update slot visualizations
             slots.forEach(slot => {
                 const slotElement = document.querySelector(`[data-slot="${slot.id}"]`);
                 const statusPill = slotElement.querySelector('.status-pill');
@@ -233,8 +296,8 @@ function updateParkingStatus() {
 
 // Initialize everything when the page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize chart
-    initChart();
+    // Initialize charts
+    initCharts();
     
     // Update status immediately
     updateParkingStatus();

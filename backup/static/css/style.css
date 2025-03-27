@@ -392,7 +392,7 @@ body {
   color: var(--success);
 }
 
-/* Chart Container */
+/* Chart Containers */
 .chart-container {
   background: white;
   border-radius: var(--radius);
@@ -409,7 +409,22 @@ body {
   margin-bottom: 1rem;
 }
 
-/* Responsive Design */
+/* Charts Layout */
+@media (min-width: 1024px) {
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .chart-container {
+    width: 100%;
+  }
+  
+  .pie-chart-container {
+    height: 350px;
+  }
+}
+
+/* Responsive Chart */
 @media (max-width: 768px) {
   .main-content {
     margin: 1rem auto;
@@ -449,6 +464,10 @@ body {
 
   .chart-container {
     height: 250px;
+  }
+  
+  .pie-chart-container {
+    height: 300px;
   }
 }
 
