@@ -5,6 +5,7 @@ import threading
 import time
 from datetime import datetime
 import os
+from collections import deque
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Generate a random secret key
@@ -24,18 +25,23 @@ class ParkingSystem:
             {'trig': 24, 'echo': 25}   # Slot 3
         ]
         
-        # LED configuration
-        self.leds = [
-            {'red': 5, 'green': 6},    # Slot 1
-            {'red': 12, 'green': 13},  # Slot 2
-            {'red': 19, 'green': 26}   # Slot 3
-        ]
+        # LED configuration (commented out since LEDs are not connected)
+        # self.leds = [
+        #     {'red': 5, 'green': 6},    # Slot 1
+        #     {'red': 12, 'green': 13},  # Slot 2
+        #     {'red': 19, 'green': 26}   # Slot 3
+        # ]
         
         # Sensor parameters
         self.MIN_DISTANCE = 2  # Minimum valid distance in cm
         self.MAX_DISTANCE = 400  # Maximum valid distance in cm
         self.OCCUPANCY_THRESHOLD = 20  # Distance threshold for occupancy in cm
         self.TIMEOUT = 0.1  # Timeout for sensor reading in seconds
+        
+        # Occupancy history data - track the last 60 minutes with 1 reading per minute
+        self.occupancy_history = deque(maxlen=60)
+        self.last_history_update = datetime.now()
+        self.history_interval = 60  # seconds
         
         self._setup_pins()
         self.status = [False] * 3  # False = empty, True = occupied
@@ -49,12 +55,12 @@ class ParkingSystem:
                 # Initialize trigger pins to LOW
                 GPIO.output(sensor['trig'], False)
             
-            for led in self.leds:
-                GPIO.setup(led['red'], GPIO.OUT)
-                GPIO.setup(led['green'], GPIO.OUT)
-                # Initialize LEDs to OFF
-                GPIO.output(led['red'], False)
-                GPIO.output(led['green'], False)
+            # Comment out LED setup since LEDs are not connected
+            # for led in self.leds:
+            #     GPIO.setup(led['red'], GPIO.OUT)
+            #     GPIO.setup(led['green'], GPIO.OUT)
+            #     GPIO.output(led['red'], False)
+            #     GPIO.output(led['green'], False)
         except Exception as e:
             print(f"Error setting up pins: {e}")
             raise
@@ -101,24 +107,42 @@ class ParkingSystem:
                     is_occupied = distance < self.OCCUPANCY_THRESHOLD
                     self.status[i] = is_occupied
                     
-                    # Update LEDs
-                    GPIO.output(self.leds[i]['red'], is_occupied)
-                    GPIO.output(self.leds[i]['green'], not is_occupied)
+                    # Comment out LED updates since LEDs are not connected
+                    # GPIO.output(self.leds[i]['red'], is_occupied)
+                    # GPIO.output(self.leds[i]['green'], not is_occupied)
                 else:
                     # If reading failed, use last valid distance
                     is_occupied = self.last_valid_distance[i] < self.OCCUPANCY_THRESHOLD
                     self.status[i] = is_occupied
                     
-                    # Update LEDs
-                    GPIO.output(self.leds[i]['red'], is_occupied)
-                    GPIO.output(self.leds[i]['green'], not is_occupied)
+                    # Comment out LED updates since LEDs are not connected
+                    # GPIO.output(self.leds[i]['red'], is_occupied)
+                    # GPIO.output(self.leds[i]['green'], not is_occupied)
                     
             except Exception as e:
                 print(f"Error updating sensor {i+1}: {e}")
                 # Keep last known status on error
                 continue
+        
+        # Update occupancy history at regular intervals
+        now = datetime.now()
+        if (now - self.last_history_update).total_seconds() >= self.history_interval:
+            occupied_count = sum(self.status)
+            total_slots = len(self.status)
+            occupancy_rate = (occupied_count / total_slots) * 100
+            
+            self.occupancy_history.append({
+                'timestamp': now.strftime('%H:%M'),
+                'occupancy_rate': occupancy_rate
+            })
+            
+            self.last_history_update = now
     
     def get_status(self):
+        occupied_count = sum(self.status)
+        total_slots = len(self.status)
+        occupancy_rate = (occupied_count / total_slots) * 100
+        
         return {
             'slots': [
                 {
@@ -128,15 +152,21 @@ class ParkingSystem:
                 }
                 for i, status in enumerate(self.status)
             ],
+            'occupancy_rate': occupancy_rate,
+            'available_spots': total_slots - occupied_count,
+            'total_spots': total_slots,
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
     
+    def get_occupancy_history(self):
+        return list(self.occupancy_history)
+    
     def cleanup(self):
         try:
-            # Turn off all LEDs
-            for led in self.leds:
-                GPIO.output(led['red'], False)
-                GPIO.output(led['green'], False)
+            # Comment out LED cleanup since LEDs are not connected
+            # for led in self.leds:
+            #     GPIO.output(led['red'], False)
+            #     GPIO.output(led['green'], False)
             GPIO.cleanup()
         except Exception as e:
             print(f"Error during cleanup: {e}")
@@ -185,6 +215,11 @@ def index():
 @login_required
 def get_status():
     return jsonify(parking_system.get_status())
+
+@app.route('/api/history')
+@login_required
+def get_history():
+    return jsonify(parking_system.get_occupancy_history())
 
 if __name__ == '__main__':
     sensor_thread = threading.Thread(target=update_sensors, daemon=True)

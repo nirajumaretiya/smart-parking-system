@@ -392,6 +392,23 @@ body {
   color: var(--success);
 }
 
+/* Chart Container */
+.chart-container {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+  height: 300px;
+}
+
+.chart-container h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .main-content {
@@ -428,6 +445,10 @@ body {
     gap: 1rem;
     padding-bottom: 1rem;
     margin-bottom: 1.5rem;
+  }
+
+  .chart-container {
+    height: 250px;
   }
 }
 

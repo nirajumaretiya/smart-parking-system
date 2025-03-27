@@ -23,6 +23,12 @@
         </div>
     </div>
 
+    <!-- Occupancy Chart Section -->
+    <div class="chart-container">
+        <h2>Occupancy Rate Over Time</h2>
+        <canvas id="occupancyChart"></canvas>
+    </div>
+
     <div class="parking-grid">
         <div class="parking-slot" data-slot="1">
             <div class="slot-header">
@@ -63,13 +69,96 @@
     </div>
 </main>
 
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+// Initialize Chart
+let occupancyChart;
+let chartLabels = [];
+let chartData = [];
+
+function initChart() {
+    const ctx = document.getElementById('occupancyChart').getContext('2d');
+    occupancyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Occupancy Rate (%)',
+                data: chartData,
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true,
+                pointRadius: 3,
+                pointBackgroundColor: 'rgba(59, 130, 246, 1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Occupancy (%)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toFixed(1) + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Fetch and update chart data
+function updateChartData() {
+    fetch('/api/history')
+        .then(response => response.json())
+        .then(historyData => {
+            // Update chart data
+            chartLabels = historyData.map(entry => entry.timestamp);
+            chartData = historyData.map(entry => entry.occupancy_rate);
+            
+            // Update chart
+            occupancyChart.data.labels = chartLabels;
+            occupancyChart.data.datasets[0].data = chartData;
+            occupancyChart.update();
+        })
+        .catch(error => console.error('Error fetching history:', error));
+}
+
 function updateParkingStatus() {
     fetch('/api/status')
         .then(response => response.json())
         .then(data => {
             const slots = data.slots;
-            let availableCount = 0;
+            let availableCount = data.available_spots;
+            
+            // Update occupancy rate directly from API
+            const occupancyRate = data.occupancy_rate.toFixed(1);
+            document.getElementById('occupancy-rate').textContent = `${occupancyRate}%`;
+            document.getElementById('available-spots').textContent = availableCount;
             
             slots.forEach(slot => {
                 const slotElement = document.querySelector(`[data-slot="${slot.id}"]`);
@@ -89,13 +178,8 @@ function updateParkingStatus() {
                     statusPill.className = 'status-pill available';
                     redLed.classList.remove('active');
                     greenLed.classList.add('active');
-                    availableCount++;
                 }
             });
-            
-            document.getElementById('available-spots').textContent = availableCount;
-            const occupancyRate = ((3 - availableCount) / 3 * 100).toFixed(1);
-            document.getElementById('occupancy-rate').textContent = `${occupancyRate}%`;
             
             // Update occupancy rate color based on percentage
             const occupancyElement = document.getElementById('occupancy-rate');
@@ -113,8 +197,18 @@ function updateParkingStatus() {
         .catch(error => console.error('Error:', error));
 }
 
-// Update status every second
-setInterval(updateParkingStatus, 1000);
-updateParkingStatus(); // Initial update
+// Initialize everything when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize chart
+    initChart();
+    
+    // Update status immediately
+    updateParkingStatus();
+    updateChartData();
+    
+    // Set up regular updates
+    setInterval(updateParkingStatus, 1000);
+    setInterval(updateChartData, 60000); // Update chart every minute
+});
 </script>
 {% endblock %} 
