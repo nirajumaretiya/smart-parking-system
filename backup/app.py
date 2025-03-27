@@ -20,19 +20,17 @@ class ParkingSystem:
         self.sensors = [
             {'trig': 17, 'echo': 27},  # Slot 1
             {'trig': 22, 'echo': 23},  # Slot 2
-            {'trig': 24, 'echo': 25},  # Slot 3
-            {'trig': 8, 'echo': 7}     # Slot 4
+            {'trig': 24, 'echo': 25}   # Slot 3
         ]
         
         self.leds = [
             {'red': 5, 'green': 6},    # Slot 1
             {'red': 12, 'green': 13},  # Slot 2
-            {'red': 19, 'green': 26},  # Slot 3
-            {'red': 16, 'green': 20}   # Slot 4
+            {'red': 19, 'green': 26}   # Slot 3
         ]
         
         self._setup_pins()
-        self.status = [False] * 4  # False = empty, True = occupied
+        self.status = [False] * 3  # False = empty, True = occupied
     
     def _setup_pins(self):
         for sensor in self.sensors:

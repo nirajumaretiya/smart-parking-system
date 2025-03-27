@@ -29,11 +29,11 @@
             <div class="stats-container">
                 <div class="stat-card">
                     <span class="stat-title">Available Spots</span>
-                    <span class="stat-value" id="available-count">-</span>
+                    <span class="stat-value" id="available-spots">3</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-title">Occupancy Rate</span>
-                    <span class="stat-value" id="occupancy-rate">-</span>
+                    <span class="stat-value" id="occupancy-rate">0%</span>
                     <span class="stat-badge" id="occupancy-badge">Normal</span>
                 </div>
             </div>
@@ -41,98 +41,101 @@
 
         <!-- Parking Grid -->
         <div class="parking-grid">
-            {% for i in range(4) %}
-            <div class="parking-slot" id="slot-{{ i+1 }}">
-                <h2>Spot {{ i+1 }}</h2>
-                <div class="status-indicator">
-                    <div class="led red" id="red-{{ i+1 }}"></div>
-                    <div class="led green" id="green-{{ i+1 }}"></div>
+            <div class="parking-slot" data-slot="1">
+                <div class="slot-header">
+                    <h3>Slot 1</h3>
+                    <div class="led-indicator">
+                        <div class="led red"></div>
+                        <div class="led green"></div>
+                    </div>
                 </div>
-                <div class="status-pill" id="status-pill-{{ i+1 }}">
-                    <span class="indicator"></span>
-                    <span id="status-{{ i+1 }}">Checking...</span>
-                </div>
+                <div class="status-pill available">Available</div>
             </div>
-            {% endfor %}
+
+            <div class="parking-slot" data-slot="2">
+                <div class="slot-header">
+                    <h3>Slot 2</h3>
+                    <div class="led-indicator">
+                        <div class="led red"></div>
+                        <div class="led green"></div>
+                    </div>
+                </div>
+                <div class="status-pill available">Available</div>
+            </div>
+
+            <div class="parking-slot" data-slot="3">
+                <div class="slot-header">
+                    <h3>Slot 3</h3>
+                    <div class="led-indicator">
+                        <div class="led red"></div>
+                        <div class="led green"></div>
+                    </div>
+                </div>
+                <div class="status-pill available">Available</div>
+            </div>
         </div>
 
         <!-- System Status -->
         <div class="last-update">
             <div class="text-center text-sm text-gray-500">
-                Last Updated: <span id="timestamp" class="font-medium">-</span>
+                Last Updated: <span id="last-update" class="font-medium">Never</span>
             </div>
         </div>
     </main>
 </div>
 
 <script>
-function updateStatus() {
+function updateParkingStatus() {
     fetch('/api/status')
         .then(response => response.json())
         .then(data => {
-            // Update timestamp
-            document.getElementById('timestamp').textContent = data.timestamp;
-            
-            // Count available spots
+            const slots = data.slots;
             let availableCount = 0;
             
-            // Update each slot
-            data.slots.forEach(slot => {
-                const slotId = slot.id;
-                const redLed = document.getElementById(`red-${slotId}`);
-                const greenLed = document.getElementById(`green-${slotId}`);
-                const statusText = document.getElementById(`status-${slotId}`);
-                const statusPill = document.getElementById(`status-pill-${slotId}`);
-                const slotElement = document.getElementById(`slot-${slotId}`);
-                
-                // Reset classes
-                redLed.classList.remove('active');
-                greenLed.classList.remove('active');
-                statusPill.classList.remove('available', 'occupied');
+            slots.forEach(slot => {
+                const slotElement = document.querySelector(`[data-slot="${slot.id}"]`);
+                const statusPill = slotElement.querySelector('.status-pill');
+                const redLed = slotElement.querySelector('.led.red');
+                const greenLed = slotElement.querySelector('.led.green');
                 
                 if (slot.occupied) {
+                    slotElement.classList.add('occupied');
+                    statusPill.textContent = 'Occupied';
+                    statusPill.className = 'status-pill occupied';
                     redLed.classList.add('active');
-                    statusText.textContent = 'Occupied';
-                    statusPill.classList.add('occupied');
-                    // Add subtle transition effect
-                    slotElement.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                    greenLed.classList.remove('active');
                 } else {
+                    slotElement.classList.remove('occupied');
+                    statusPill.textContent = 'Available';
+                    statusPill.className = 'status-pill available';
+                    redLed.classList.remove('active');
                     greenLed.classList.add('active');
-                    statusText.textContent = 'Available';
-                    statusPill.classList.add('available');
                     availableCount++;
-                    // Add subtle transition effect
-                    slotElement.style.borderColor = 'rgba(16, 185, 129, 0.3)';
                 }
             });
             
-            // Update stats
-            document.getElementById('available-count').textContent = `${availableCount} / ${data.slots.length}`;
-            
-            const occupancyRate = Math.round(((data.slots.length - availableCount) / data.slots.length) * 100);
+            document.getElementById('available-spots').textContent = availableCount;
+            const occupancyRate = ((3 - availableCount) / 3 * 100).toFixed(1);
             document.getElementById('occupancy-rate').textContent = `${occupancyRate}%`;
             
-            const occupancyBadge = document.getElementById('occupancy-badge');
-            occupancyBadge.classList.remove('bg-green-100', 'text-green-800', 'bg-yellow-100', 'text-yellow-800', 'bg-red-100', 'text-red-800');
-            
-            if (occupancyRate < 50) {
-                occupancyBadge.textContent = 'Low';
-                occupancyBadge.classList.add('bg-green-100', 'text-green-800');
-            } else if (occupancyRate < 80) {
-                occupancyBadge.textContent = 'Moderate';
-                occupancyBadge.classList.add('bg-yellow-100', 'text-yellow-800');
+            // Update occupancy rate color based on percentage
+            const occupancyElement = document.getElementById('occupancy-rate');
+            occupancyElement.className = '';
+            if (occupancyRate >= 80) {
+                occupancyElement.classList.add('high-occupancy');
+            } else if (occupancyRate >= 50) {
+                occupancyElement.classList.add('moderate-occupancy');
             } else {
-                occupancyBadge.textContent = 'High';
-                occupancyBadge.classList.add('bg-red-100', 'text-red-800');
-                // Add pulse animation to indicate high occupancy
-                occupancyBadge.classList.add('pulse');
+                occupancyElement.classList.add('low-occupancy');
             }
+            
+            document.getElementById('last-update').textContent = data.timestamp;
         })
         .catch(error => console.error('Error:', error));
 }
 
 // Update status every second
-setInterval(updateStatus, 1000);
-updateStatus(); // Initial update
+setInterval(updateParkingStatus, 1000);
+updateParkingStatus(); // Initial update
 </script>
 {% endblock %} 
