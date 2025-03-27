@@ -201,19 +201,18 @@ function initCharts() {
         data: {
             labels: ['Slot 1', 'Slot 2', 'Slot 3'],
             datasets: [{
-                data: [0, 0, 0], // Default to no usage
+                data: [1, 1, 1], // Start with equal values to show equal percentages
                 backgroundColor: [
-                    'rgba(59, 130, 246, 0.8)',  // Blue for Slot 1, more opaque
-                    'rgba(139, 92, 246, 0.8)',  // Purple for Slot 2, more opaque
-                    'rgba(245, 158, 11, 0.8)'   // Orange for Slot 3, more opaque
+                    'rgba(59, 130, 246, 0.8)',  // Blue for Slot 1
+                    'rgba(139, 92, 246, 0.8)',  // Purple for Slot 2
+                    'rgba(245, 158, 11, 0.8)'   // Orange for Slot 3
                 ],
                 borderColor: [
                     'rgba(59, 130, 246, 1)',
                     'rgba(139, 92, 246, 1)',
                     'rgba(245, 158, 11, 1)'
                 ],
-                borderWidth: 2,
-                hoverOffset: 15 // More separation on hover
+                borderWidth: 2
             }]
         },
         options: {
@@ -242,18 +241,14 @@ function initCharts() {
                         return percentage;
                     },
                     display: function(context) {
-                        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                        return total > 0 && context.raw > 0;
+                        const value = context.dataset.data[context.dataIndex];
+                        return value > 0; // Show label if value is greater than 0
                     },
-                    textShadow: {
-                        x: 2,
-                        y: 2,
-                        blur: 5,
-                        color: 'rgba(0, 0, 0, 0.5)'
-                    },
-                    borderWidth: 2,
-                    borderColor: 'white',
-                    borderRadius: 4,
+                    textStrokeColor: 'rgba(0, 0, 0, 0.8)',
+                    textStrokeWidth: 4,
+                    align: 'center',
+                    anchor: 'center',
+                    offset: 0,
                     padding: 6
                 },
                 legend: {
