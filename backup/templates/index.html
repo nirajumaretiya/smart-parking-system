@@ -1,88 +1,67 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <h1 class="text-2xl font-bold text-primary-600">Smart Parking System</h1>
-                </div>
-                <div class="flex items-center">
-                    <a href="{{ url_for('logout') }}" 
-                        class="logout-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm7 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm2 4a1 1 0 01-1 1H7a1 1 0 110-2h4a1 1 0 011 1z" clip-rule="evenodd" />
-                        </svg>
-                        Logout
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container">
-        <div class="header">
-            <h1>Parking Dashboard</h1>
-            <div class="stats-container">
-                <div class="stat-card">
-                    <span class="stat-title">Available Spots</span>
-                    <span class="stat-value" id="available-spots">3</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-title">Occupancy Rate</span>
-                    <span class="stat-value" id="occupancy-rate">0%</span>
-                    <span class="stat-badge" id="occupancy-badge">Normal</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Parking Grid -->
-        <div class="parking-grid">
-            <div class="parking-slot" data-slot="1">
-                <div class="slot-header">
-                    <h3>Slot 1</h3>
-                    <div class="led-indicator">
-                        <div class="led red"></div>
-                        <div class="led green"></div>
-                    </div>
-                </div>
-                <div class="status-pill available">Available</div>
-            </div>
-
-            <div class="parking-slot" data-slot="2">
-                <div class="slot-header">
-                    <h3>Slot 2</h3>
-                    <div class="led-indicator">
-                        <div class="led red"></div>
-                        <div class="led green"></div>
-                    </div>
-                </div>
-                <div class="status-pill available">Available</div>
-            </div>
-
-            <div class="parking-slot" data-slot="3">
-                <div class="slot-header">
-                    <h3>Slot 3</h3>
-                    <div class="led-indicator">
-                        <div class="led red"></div>
-                        <div class="led green"></div>
-                    </div>
-                </div>
-                <div class="status-pill available">Available</div>
-            </div>
-        </div>
-
-        <!-- System Status -->
-        <div class="last-update">
-            <div class="text-center text-sm text-gray-500">
-                Last Updated: <span id="last-update" class="font-medium">Never</span>
-            </div>
-        </div>
-    </main>
+<div class="nav-bar">
+    <h1>Smart Parking System</h1>
+    <a href="/logout" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
 </div>
+
+<main class="main-content">
+    <div class="header">
+        <h1>Parking Dashboard</h1>
+        <div class="stats-container">
+            <div class="stat-box">
+                <h3>Available Spots</h3>
+                <p id="available-spots">3</p>
+            </div>
+            <div class="stat-box">
+                <h3>Occupancy Rate</h3>
+                <p id="occupancy-rate">0%</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="parking-grid">
+        <div class="parking-slot" data-slot="1">
+            <div class="slot-header">
+                <h3>Slot 1</h3>
+                <div class="led-indicator">
+                    <div class="led red"></div>
+                    <div class="led green"></div>
+                </div>
+            </div>
+            <div class="status-pill available">Available</div>
+        </div>
+
+        <div class="parking-slot" data-slot="2">
+            <div class="slot-header">
+                <h3>Slot 2</h3>
+                <div class="led-indicator">
+                    <div class="led red"></div>
+                    <div class="led green"></div>
+                </div>
+            </div>
+            <div class="status-pill available">Available</div>
+        </div>
+
+        <div class="parking-slot" data-slot="3">
+            <div class="slot-header">
+                <h3>Slot 3</h3>
+                <div class="led-indicator">
+                    <div class="led red"></div>
+                    <div class="led green"></div>
+                </div>
+            </div>
+            <div class="status-pill available">Available</div>
+        </div>
+    </div>
+
+    <div class="system-status">
+        <p>Last Update: <span id="last-update">Never</span></p>
+    </div>
+</main>
 
 <script>
 function updateParkingStatus() {
