@@ -135,14 +135,18 @@ Slot 4:
 smart-parking-system/
 ├── backend/                # Flask backend
 │   ├── app.py              # Main Flask application
-│   ├── package.json        # Backend package info
 │   └── requirements.txt    # Python dependencies
 │
-└── frontend-next/          # Next.js frontend
+└── frontend/               # Frontend
     ├── src/                # Source code
-    ├── public/             # Static files
+    │   ├── index.html      # Main dashboard page
+    │   ├── login.html      # Login page
+    │   ├── css/            # CSS styles
+    │   └── js/             # JavaScript files
+    ├── dist/               # Built assets (after npm run build)
     ├── package.json        # Frontend dependencies
-    └── next.config.mjs     # Next.js configuration
+    ├── vite.config.js      # Vite configuration
+    └── tailwind.config.js  # Tailwind CSS configuration
 ```
 
 ## Prerequisites
@@ -184,7 +188,7 @@ smart-parking-system/
 
 1. Navigate to the frontend directory:
    ```
-   cd frontend-next
+   cd frontend
    ```
 
 2. Install dependencies:
@@ -196,7 +200,15 @@ smart-parking-system/
    ```
    npm run dev
    ```
-   The frontend will be available at http://localhost:3000
+   The frontend will be available at http://localhost:5173
+
+### Running Both Together
+
+You can use the provided script to run both the frontend and backend simultaneously:
+
+```
+./run.sh
+```
 
 ## Features
 
@@ -214,19 +226,18 @@ smart-parking-system/
 
 ## Running in Production
 
+### Frontend
+
+```
+cd frontend
+npm run build
+```
+
 ### Backend
 
 ```
 cd backend
 gunicorn -w 4 -b 0.0.0.0:5000 app:app
-```
-
-### Frontend
-
-```
-cd frontend-next
-npm run build
-npm start
 ```
 
 ## License

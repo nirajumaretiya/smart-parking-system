@@ -14,17 +14,11 @@ app = Flask(__name__,
     static_folder='../frontend/dist',  # Serve static files from frontend build
     static_url_path=''  # Serve at root URL
 )
-# Enable CORS with credentials support
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}})
+# Enable CORS
+CORS(app)  # Enable CORS for all routes
 
-# Use a consistent secret key for development
-app.secret_key = 'smart-parking-system-development-key'
-
-# Configure session to be more compatible with Next.js
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_PATH'] = '/'
+# Use a secure secret key
+app.secret_key = os.urandom(24)
 
 # Admin credentials (in a real application, these should be stored securely in a database)
 ADMIN_USERNAME = "admin"
@@ -162,35 +156,34 @@ def login_required(f):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Check if the request is JSON
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        # Handle JSON requests from JavaScript
         if request.is_json:
             data = request.get_json()
             username = data.get('username')
             password = data.get('password')
-        else:
-            # Handle form data
-            username = request.form.get('username')
-            password = request.form.get('password')
         
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['logged_in'] = True
-            # If the request expects JSON, return JSON
-            if request.is_json or request.headers.get('Accept') == 'application/json':
+            
+            # Return JSON response for AJAX requests
+            if request.is_json:
                 return jsonify({'success': True}), 200
-            # Otherwise redirect (for form submissions)
+            
+            # Redirect to dashboard for form submissions
             return redirect(url_for('index'))
         else:
-            # Return error as JSON if requested, otherwise render template
-            if request.is_json or request.headers.get('Accept') == 'application/json':
+            # Return JSON error for AJAX requests
+            if request.is_json:
                 return jsonify({'error': 'Invalid username or password'}), 401
-            return render_template('login.html', error='Invalid username or password')
+            
+            # Render login template with error for form submissions
+            return send_from_directory('../frontend/dist', 'login.html')
     
-    # For GET requests, check if JSON is expected
-    if request.headers.get('Accept') == 'application/json':
-        return jsonify({'message': 'Please submit login credentials'}), 200
-    
-    # Otherwise render the login template
-    return render_template('login.html')
+    # GET request - render login page
+    return send_from_directory('../frontend/dist', 'login.html')
 
 @app.route('/logout')
 def logout():
@@ -200,7 +193,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return send_from_directory(app.static_folder, 'index.html')
+    return send_from_directory('../frontend/dist', 'index.html')
 
 @app.route('/api/status')
 @login_required

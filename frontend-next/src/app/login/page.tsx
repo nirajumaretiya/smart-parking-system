@@ -7,12 +7,12 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: FormEvent) => {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
     setError('');
 
     try {
@@ -24,94 +24,79 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json().catch(() => ({ message: 'Failed to parse server response' }));
-
       if (response.ok) {
-        router.push('/');
+        router.push('/dashboard');
       } else {
-        setError(data.message || 'Login failed. Please try again.');
+        const data = await response.json();
+        setError(data.message || 'Login failed. Please check your credentials.');
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      setError('Network error. Please try again later.');
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+      console.error(err);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
-      <div className="glass-effect p-8 rounded-lg w-full max-w-md">
-        <div className="mb-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white mx-auto mb-4">
-            <i className="fas fa-parking text-3xl"></i>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
+      <div className="w-full max-w-md backdrop-blur-lg bg-white/30 rounded-xl shadow-2xl overflow-hidden">
+        <div className="p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white mb-2">Smart Parking System</h1>
+            <p className="text-white/80">Sign in to access the dashboard</p>
           </div>
-          <h2 className="text-2xl font-bold text-gray-800">Smart Parking System</h2>
-          <p className="text-gray-600 mt-1">Login to access the dashboard</p>
-        </div>
 
-        {error && (
-          <div className="mb-4 p-3 rounded bg-red-50 border border-red-200 text-red-700 text-sm flex items-start">
-            <i className="fas fa-exclamation-circle mt-0.5 mr-2"></i>
-            <span>{error}</span>
-          </div>
-        )}
+          {error && (
+            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded" role="alert">
+              <p>{error}</p>
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="username">
-              Username
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i className="fas fa-user text-gray-400"></i>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-white mb-1">
+                Username
+              </label>
               <input
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 id="username"
+                name="username"
                 type="text"
-                placeholder="Enter your username"
+                required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                required
+                className="w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter your username"
               />
             </div>
-          </div>
 
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="password">
-              Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i className="fas fa-lock text-gray-400"></i>
-              </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-white mb-1">
+                Password
+              </label>
               <input
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 id="password"
+                name="password"
                 type="password"
-                placeholder="Enter your password"
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                className="w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter your password"
               />
             </div>
-          </div>
 
-          <button
-            className="w-full btn btn-primary py-3 flex justify-center text-base"
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <span className="flex items-center">
-                <i className="fas fa-circle-notch fa-spin mr-2"></i> Logging in...
-              </span>
-            ) : (
-              'Login'
-            )}
-          </button>
-        </form>
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
