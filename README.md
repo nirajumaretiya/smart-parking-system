@@ -126,10 +126,3 @@ The system provides several visualization features:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📞 Support
-
-For support, please open an issue in the GitHub repository or contact the maintainers.
-
----
-
-Made with ❤️ by [Your Name]
