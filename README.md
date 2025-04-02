@@ -1,88 +1,89 @@
 # 🚗 Smart Parking System
 
-A modern, IoT-based smart parking system that uses ultrasonic sensors to monitor parking space occupancy in real-time. This system provides a user-friendly web interface for monitoring parking spaces, viewing occupancy history, and analyzing parking space usage patterns.
+A simple yet powerful parking management system that helps you monitor parking spaces in real-time using Raspberry Pi and ultrasonic sensors. Perfect for small parking lots, garages, or personal use!
 
-![Smart Parking System](https://raw.githubusercontent.com/yourusername/smart-parking-system/main/assets/smart-parking-system.png)
+## 🎯 Quick Start Guide
 
-## 🌟 Features
+1. **Connect Your Hardware**
+   - Plug in your Raspberry Pi
+   - Connect ultrasonic sensors to GPIO pins
+   - Power up the system
 
-- **Real-time Parking Monitoring**
-  - Live status of each parking slot
-  - Ultrasonic sensor-based occupancy detection
-  - Visual indicators for occupied/available spaces
+2. **Install the Software**
+   ```bash
+   # Install required packages
+   sudo apt-get update
+   sudo apt-get install python3-pip
 
-- **Advanced Analytics**
-  - Occupancy rate tracking
-  - Historical data visualization
-  - Parking space usage statistics
-  - Real-time occupancy trends
+   # Install project dependencies
+   pip3 install -r requirements.txt
+   ```
 
-- **Secure Access**
-  - Admin authentication system
-  - Protected dashboard access
-  - Secure API endpoints
+3. **Run the System**
+   ```bash
+   python3 backend/app.py
+   ```
 
-- **Responsive Web Interface**
-  - Modern, user-friendly dashboard
-  - Real-time updates
-  - Interactive charts and graphs
-  - Mobile-responsive design
+4. **Access the Dashboard**
+   - Open your web browser
+   - Type: `http://[YOUR_RPI_IP]:5000`
+   - Login with: username: `admin`, password: `admin123`
 
-## 🛠️ Technical Stack
+## 🛠️ What You'll Need
 
-### Backend
-- **Python Flask** - Web framework
-- **RPi.GPIO** - Raspberry Pi GPIO control
-- **Ultrasonic Sensors** - HC-SR04 for distance measurement
-- **Threading** - Concurrent sensor monitoring
-
-### Frontend
-- **HTML5/CSS3** - Modern web interface
-- **JavaScript** - Real-time updates and interactivity
-- **Chart.js** - Data visualization
-- **Bootstrap** - Responsive design
-
-## 📋 Hardware Requirements
-
-- Raspberry Pi (any model with GPIO pins)
-- HC-SR04 Ultrasonic Sensors
+### Hardware
+- Raspberry Pi (any model)
+- HC-SR04 Ultrasonic Sensors (1 per parking spot)
 - Jumper wires
-- Power supply
-- Optional: LED indicators
+- Power supply for Raspberry Pi
 
-## 🚀 Getting Started
-
-### Prerequisites
+### Software
+- Raspberry Pi OS (latest version)
 - Python 3.x
-- Flask
-- RPi.GPIO
-- Raspberry Pi OS
+- All required packages (listed in requirements.txt)
 
-### Installation
+## 📱 How to Find Your Raspberry Pi IP
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/smart-parking-system.git
-cd smart-parking-system
-```
+1. **Method 1: Using Terminal**
+   ```bash
+   hostname -I
+   ```
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+2. **Method 2: Using Router**
+   - Log into your router
+   - Look for connected devices
+   - Find your Raspberry Pi
 
-3. Configure the system:
-- Connect ultrasonic sensors to GPIO pins as specified in the code
-- Update sensor configurations if needed
+## 🔧 Simple Configuration
 
-4. Run the application:
-```bash
-python backend/app.py
-```
+Edit `backend/app.py` to customize:
+- Number of parking spots
+- Sensor sensitivity
+- Update frequency
+- Admin password
 
-5. Access the web interface:
-- Open your browser and navigate to `http://localhost:5000`
-- Login with admin credentials (default: admin/admin123)
+## 📊 What You Can Monitor
+
+- Available parking spots
+- Occupancy rate
+- Usage history
+- Real-time updates
+
+## 🔒 Security
+
+- Change the default password after first login
+- Access only from your local network
+- Basic authentication protection
+
+## ❓ Need Help?
+
+1. Check the troubleshooting guide
+2. Contact support
+3. Visit our GitHub issues page
+
+## 📝 License
+
+Free to use and modify for personal and commercial projects.
 
 ## 📊 System Architecture
 
@@ -124,10 +125,6 @@ The system provides several visualization features:
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 📞 Support
 
