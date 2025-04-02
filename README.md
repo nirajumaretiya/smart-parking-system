@@ -2,7 +2,7 @@
 
 A modern, IoT-based smart parking system that uses ultrasonic sensors to monitor parking space occupancy in real-time. This system provides a user-friendly web interface for monitoring parking spaces, viewing occupancy history, and analyzing parking space usage patterns.
 
-![Smart Parking System](https://via.placeholder.com/800x400?text=Smart+Parking+System)
+![Smart Parking System](https://raw.githubusercontent.com/yourusername/smart-parking-system/main/assets/smart-parking-system.png)
 
 ## 🌟 Features
 
